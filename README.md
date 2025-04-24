@@ -59,10 +59,7 @@ EM BREVE
 
 Requisitos
 ----------
-
--   **Linguagem de Programação:** C/C++
--   **Bibliotecas:** pthread, SDL2 (para interface gráfica)
--   **Sistema Operacional:** Linux, macOS (preferencialmente)
+EM BREV
 
 * * * * *
 
