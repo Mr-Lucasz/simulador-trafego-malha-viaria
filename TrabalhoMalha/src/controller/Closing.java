@@ -1,0 +1,63 @@
+package controller;
+
+import model.Carro;
+
+import java.util.List;
+
+public class Closing extends StateCarro {
+
+    public Closing(Controller controller) {
+        super(controller);
+    }
+
+    @Override
+    public void execute() {
+        controller.await();
+        if(controller.getCarros().isEmpty())
+            nextState();
+    }
+
+    @Override
+    public void nextState() {
+        ThreadKiller tk = new ThreadKiller(controller.getCarros());
+        tk.start();
+        try {
+            tk.join();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        controller.getCarros().clear();
+        controller.getMatrizInstance().gerarMatriz(controller.getArquivo());
+        controller.setStateCarro(new Finished(controller));
+        controller.notificarContador();
+        controller.nitifcarReset();
+        controller.notificarControle();
+    }
+
+    @Override
+    public String getNextAction() {
+        return "FINALIZAR";
+    }
+class ThreadKiller extends Thread{
+        List<Carro> cars;
+        public ThreadKiller(List<Carro> cars){
+            this.cars=cars;
+        }
+
+    @Override
+    public void run() {
+        for(Carro carro : cars)
+        {
+            carro.setDesligado(true);
+        }
+        for (Carro carro:cars)
+        {
+            try {
+                carro.join();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+}
+}

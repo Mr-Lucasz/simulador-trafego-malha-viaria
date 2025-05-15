@@ -1,6 +1,6 @@
 package model;
 
-public class Estrada {
+public abstract class Estrada {
     protected boolean saida = false;
     protected boolean entrada;
     protected Estrada proxima;
@@ -79,4 +79,9 @@ public class Estrada {
         this.coluna = coluna;
     }
 
+    public boolean isCruzamento(){
+        if(this.direcao>4)
+            return true;
+        return false;
+    }
 }
