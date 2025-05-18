@@ -20,7 +20,7 @@ public class JPanelImage extends JPanel {
         this.width = width;
         this.height = height;
         setOpaque(false);
-        background = new ImageIcon(getClass().getResource(path)).getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        background = new  ImageIcon(path).getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
     }
 
     public void paintComponent(Graphics g) {

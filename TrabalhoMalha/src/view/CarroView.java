@@ -26,8 +26,8 @@ public class CarroView extends JPanelImage {
         {
             GridBagConstraints gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.fill = GridBagConstraints.BOTH;
-            int tamanho = (int) (this.getWidth() * 0.5);
-            ImageIcon icon = new ImageIcon(new ImageIcon(getClass().getResource("imagens/carro.png")).
+            int tamanho = (int) (this.getWidth() * 0.6);
+            ImageIcon icon = new ImageIcon(new ImageIcon("src/imagens/carro.png").
                     getImage().getScaledInstance(tamanho, tamanho, Image.SCALE_SMOOTH));
             JLabel carrinho = new JLabel(icon);
             add(carrinho, gridBagConstraints);

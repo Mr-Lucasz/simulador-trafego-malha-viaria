@@ -1,5 +1,7 @@
+import view.Index;
+
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello world!");
+        Index index = new Index();
     }
 }

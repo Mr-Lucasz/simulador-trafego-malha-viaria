@@ -55,6 +55,7 @@ public class Carro extends Thread{
     public void moverMalha()
     {
         Mutex proximo = (Mutex) atual.getProxima();
+        System.out.println("socorro");
         try
         {
             proximo.getSemaphore().acquire();

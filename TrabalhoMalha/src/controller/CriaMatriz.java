@@ -80,7 +80,8 @@ public class CriaMatriz {
             for(int j=0;j<matriz[i].length;j++)
                 matriz[i][j].setProxima(matriz);
         }
-
+        gerarEntradas();
+        gerarSaidas();
     }
 
     public int getDirecao(int i, int j){
@@ -93,8 +94,11 @@ public class CriaMatriz {
         {
             for(int j=0;j<matriz[i].length;j++)
             {
-                matriz[i][j].setSaida(true);
-                saidas.add(matriz[i][j]);
+                if (getDirecao(i, j) > 0 && getDirecao(i, j) < 5 && matriz[i][j].getProxima() == null)
+                {
+                    matriz[i][j].setSaida(true);
+                    saidas.add(matriz[i][j]);
+                }
             }
         }
         System.out.println("saidas");
