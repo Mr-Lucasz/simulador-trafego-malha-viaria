@@ -22,9 +22,11 @@ public class Index extends JFrame implements Observer {
     JLabel lblVel;
     JLabel lvlCount;
     JLabel lblcarCount;
+    JLabel lblTipo;
     JComboBox<String> matrizes;
     JSpinner tfVelInsercao;
     JSpinner tfCarro;
+    JSpinner tfTipo;
 
     public Index() {
         controller = Controller.getInstance();
@@ -65,9 +67,12 @@ public class Index extends JFrame implements Observer {
         lblCar = new JLabel("Quantidade de carros: ");
         lblVel = new JLabel("Delay de inserção: ");
         lblcarCount = new JLabel("Quantidade de carros:");
+        lblTipo = new JLabel("Tipo: ");
         lvlCount = new JLabel("0");
         tfCarro = new JSpinner(new SpinnerNumberModel(1,1,200,1));
         tfVelInsercao = new JSpinner(new SpinnerNumberModel(1,1,10,1));
+        tfTipo = new JSpinner(new SpinnerNumberModel(1,1,2,1));
+
 
         menuCom.add(btControll);
         menuCom.add(matrizes);
@@ -77,6 +82,8 @@ public class Index extends JFrame implements Observer {
         menuCom.add(tfVelInsercao);
         menuCom.add(lblcarCount);
         menuCom.add(lvlCount);
+        menuCom.add(lblTipo);
+        menuCom.add(tfTipo);
 
         mLayout.gridx=0;
         mLayout.gridy=0;
@@ -98,6 +105,7 @@ public class Index extends JFrame implements Observer {
             {
                 controller.setQtdCarro((int) tfCarro.getValue());
                 controller.setAwait((int) tfVelInsercao.getValue());
+                controller.setTipo((int) tfTipo.getValue());
             }
             controller.getStateCarro().nextState();
         });

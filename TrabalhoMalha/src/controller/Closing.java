@@ -1,6 +1,6 @@
 package controller;
 
-import model.Carro;
+import model.AbstractCarro;
 
 import java.util.List;
 
@@ -39,18 +39,18 @@ public class Closing extends StateCarro {
         return "FINALIZAR";
     }
 class ThreadKiller extends Thread{
-        List<Carro> cars;
-        public ThreadKiller(List<Carro> cars){
+        List<AbstractCarro> cars;
+        public ThreadKiller(List<AbstractCarro> cars){
             this.cars=cars;
         }
 
     @Override
     public void run() {
-        for(Carro carro : cars)
+        for(AbstractCarro carro : cars)
         {
             carro.setDesligado(true);
         }
-        for (Carro carro:cars)
+        for (AbstractCarro carro:cars)
         {
             try {
                 carro.join();

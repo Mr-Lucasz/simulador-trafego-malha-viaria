@@ -5,7 +5,7 @@ public abstract class Estrada {
     protected boolean entrada;
     protected Estrada proxima;
     protected int direcao;
-    protected Carro carro;
+    protected AbstractCarro carroSemaforo;
     protected int linha;
     protected int coluna;
 
@@ -55,12 +55,12 @@ public abstract class Estrada {
         this.direcao = direcao;
     }
 
-    public Carro getCarro() {
-        return carro;
+    public AbstractCarro getCarro() {
+        return carroSemaforo;
     }
 
-    public void setCarro(Carro carro) {
-        this.carro = carro;
+    public void setCarro(AbstractCarro carroSemaforo) {
+        this.carroSemaforo = carroSemaforo;
     }
 
     public int getLinha() {

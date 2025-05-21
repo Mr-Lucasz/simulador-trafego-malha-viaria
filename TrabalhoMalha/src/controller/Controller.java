@@ -1,6 +1,6 @@
 package controller;
 
-import model.Carro;
+import model.AbstractCarro;
 import model.Direcoes;
 
 import java.io.File;
@@ -11,6 +11,7 @@ public class Controller extends Thread{
     private final CriaMatriz matrizInstance = CriaMatriz.getInstance();
     private static Controller instance;
     private StateCarro state;
+    private int tipo;
     private List<Observer> observers = new ArrayList<>();
     private Map<String, String> caminhos = new HashMap<>();
     private String arquivo = "src/malhas/malha-exemplo-1.txt";
@@ -21,6 +22,14 @@ public class Controller extends Thread{
         initMapa();
         state = new Finished(this);
         this.start();
+    }
+
+    public int getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(int tipo) {
+        this.tipo = tipo;
     }
 
     public static Controller getInstance(){
@@ -73,7 +82,7 @@ public class Controller extends Thread{
         }
     }
 
-    private List<Carro> carros = new ArrayList<>();
+    private List<AbstractCarro> carros = new ArrayList<>();
     private int qtdCarro;
     private int await;
     private boolean stop = true;
@@ -102,7 +111,7 @@ public class Controller extends Thread{
         this.qtdCarro = qtdCarro;
     }
 
-    public List<Carro> getCarros() {
+    public List<AbstractCarro> getCarros() {
         return carros;
     }
 

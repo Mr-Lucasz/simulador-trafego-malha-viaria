@@ -1,7 +1,6 @@
 package controller;
 
-import model.Carro;
-import model.Mutex;
+import model.*;
 
 public class Started extends StateCarro {
 
@@ -20,9 +19,15 @@ public class Started extends StateCarro {
         int i=0;
         while(!controller.isStop())
         {
+            CarroFactory factory = null;
             if(controller.getCarros().size()<controller.getQtdCarro())
             {
-                Carro novoCarro = new Carro(controller);
+                if (controller.getTipo()==1)
+                    factory = new SemaforoCarroFactory();
+                else
+                    factory = new MonitorCarroFactory();
+
+                AbstractCarro novoCarro = factory.criarCarro(controller);
                 Mutex entrada = controller.getMatrizInstance().getEntradas().get(i);
                 Integer[][] posicoes = {{null,null}, {entrada.getLinha(),entrada.getColuna()}};
                 if(novoCarro.entrarMalha(entrada))
