@@ -1,5 +1,7 @@
 package model;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 public abstract class Estrada {
     protected boolean saida = false;
     protected boolean entrada;
@@ -8,6 +10,7 @@ public abstract class Estrada {
     protected AbstractCarro carroSemaforo;
     protected int linha;
     protected int coluna;
+    protected ReentrantLock lock = new ReentrantLock();
 
     public Estrada(int direcao, int linha, int coluna) {
         this.direcao=direcao;
@@ -83,5 +86,9 @@ public abstract class Estrada {
         if(this.direcao>4)
             return true;
         return false;
+    }
+
+    public ReentrantLock getLock() {
+        return lock;
     }
 }

@@ -26,12 +26,12 @@ public class Index extends JFrame implements Observer {
     JComboBox<String> matrizes;
     JSpinner tfVelInsercao;
     JSpinner tfCarro;
-    JSpinner tfTipo;
+    JComboBox<String> cbTipo;
 
     public Index() {
         controller = Controller.getInstance();
         controller.addObserver(this);
-        setTitle("Malha");
+        setTitle("Simulador de Tráfego em Malha Viária");
         setSize(1400, 825);
         setLayout(gbl);
         getContentPane().setBackground(Color.WHITE);
@@ -60,21 +60,25 @@ public class Index extends JFrame implements Observer {
     }
 
     private void inializeMenu() {
-
         settings.setLayout(new GridBagLayout());
         GridBagConstraints mLayout = new GridBagConstraints();
         btControll = new JButton("Iniciar");
+        btControll.setToolTipText("Inicia, pausa ou finaliza a simulação");
         matrizes = new JComboBox<>();
+        matrizes.setToolTipText("Selecione a malha viária");
         lblCar = new JLabel("Quantidade de carros: ");
         lblVel = new JLabel("Delay de inserção: ");
-        lblcarCount = new JLabel("Quantidade de carros:");
+        lblcarCount = new JLabel("Carros na malha:");
         lblTipo = new JLabel("Tipo: ");
         lvlCount = new JLabel("0");
         tfCarro = new JSpinner(new SpinnerNumberModel(1,1,200,1));
+        tfCarro.setToolTipText("Máximo de veículos simultâneos");
         tfVelInsercao = new JSpinner(new SpinnerNumberModel(1,1,10,1));
-        tfTipo = new JSpinner(new SpinnerNumberModel(1,1,2,1));
+        tfVelInsercao.setToolTipText("Intervalo de inserção de veículos (x100 ms)");
+        cbTipo = new JComboBox<>(new String[]{"Semáforo", "Monitor"});
+        cbTipo.setToolTipText("Escolha o mecanismo de exclusão mútua");
 
-
+        menuCom.clear();
         menuCom.add(btControll);
         menuCom.add(matrizes);
         menuCom.add(lblCar);
@@ -84,10 +88,11 @@ public class Index extends JFrame implements Observer {
         menuCom.add(lblcarCount);
         menuCom.add(lvlCount);
         menuCom.add(lblTipo);
-        menuCom.add(tfTipo);
+        menuCom.add(cbTipo);
 
         mLayout.gridx=0;
         mLayout.gridy=0;
+        mLayout.insets = new Insets(0, 8, 0, 8);
 
         for(int i=0;i< menuCom.size();i++)
         {
@@ -95,7 +100,6 @@ public class Index extends JFrame implements Observer {
             mLayout.weightx=1.0;
             settings.add(menuCom.get(i), mLayout);
         }
-
         addActions();
     }
 
@@ -106,7 +110,7 @@ public class Index extends JFrame implements Observer {
             {
                 controller.setQtdCarro((int) tfCarro.getValue());
                 controller.setAwait((int) tfVelInsercao.getValue());
-                controller.setTipo((int) tfTipo.getValue());
+                controller.setTipo(cbTipo.getSelectedIndex() + 1); 
             }
             controller.getStateCarro().nextState();
         });
@@ -126,7 +130,22 @@ public class Index extends JFrame implements Observer {
     @Override
     public void updateControle(boolean estado) {
         matrizes.setEnabled(estado);
+        tfCarro.setEnabled(estado);
+        tfVelInsercao.setEnabled(estado);
+        cbTipo.setEnabled(estado);
+        btControll.setEnabled(true);
         btControll.setText(controller.getStateCarro().getNextAction());
+        if (!estado) {
+            matrizes.setToolTipText("A simulação está em execução");
+            tfCarro.setToolTipText("A simulação está em execução");
+            tfVelInsercao.setToolTipText("A simulação está em execução");
+            cbTipo.setToolTipText("A simulação está em execução");
+        } else {
+            matrizes.setToolTipText("Selecione a malha viária");
+            tfCarro.setToolTipText("Máximo de veículos simultâneos");
+            tfVelInsercao.setToolTipText("Intervalo de inserção de veículos (x100 ms)");
+            cbTipo.setToolTipText("Escolha o mecanismo de exclusão mútua");
+        }
     }
 
     @Override
