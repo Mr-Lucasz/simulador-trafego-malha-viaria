@@ -1,6 +1,8 @@
 .idea/
 out/
 *.iml
+.class
+.xml
 
 ### IntelliJ IDEA ###
 out/
@@ -32,3 +34,5 @@ bin/
 ### Mac OS ###
 .DS_Store
 
+
+.fake
