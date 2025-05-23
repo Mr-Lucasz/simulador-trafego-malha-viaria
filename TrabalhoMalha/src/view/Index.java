@@ -46,6 +46,7 @@ public class Index extends JFrame implements Observer {
         layoutConstraints.gridy=0;
         layoutConstraints.weighty=0.1;
 
+
         settings = new JPanelImage("TrabalhoMalha/src/imagens/configs.png", 1300, 65);
         settings.setPreferredSize(new Dimension(settings.getWidth(),settings.getHeight()));
         settings.setOpaque(false);

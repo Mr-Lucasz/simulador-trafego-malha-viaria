@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum Direcoes {
+
     semEstrada(0, "TrabalhoMalha/src/imagens/semEstrada.png"),
     estradaCima(1, "TrabalhoMalha/src/imagens/estradaCima.png"),
     estradaDireita(2, "TrabalhoMalha/src/imagens/estradaDir.png"),

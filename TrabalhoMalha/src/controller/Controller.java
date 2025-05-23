@@ -69,12 +69,14 @@ public class Controller extends Thread{
     }
 
     private void initMapa() {
+
         File pasta = new File("TrabalhoMalha/src/malhas");
         File[] malhas = pasta.listFiles();
         if (malhas == null) {
             System.err.println("Diretório de malhas não encontrado: " + pasta.getAbsolutePath());
             return;
         }
+
         String[] nomeMalha = new String[malhas.length];
         for(int i=0;i<malhas.length;i++)
         {
