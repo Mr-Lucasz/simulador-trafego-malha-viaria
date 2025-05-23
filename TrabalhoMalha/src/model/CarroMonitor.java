@@ -172,6 +172,7 @@ public class CarroMonitor extends AbstractCarro {
                 List<Estrada> acquired = new ArrayList<>();
                 boolean conseguiuTodos = true;
                 try {
+                    // Tenta adquirir todos os locks do caminho
                     for (Estrada pos : caminhoA) {
                         if (!pos.getLock().tryLock(100, java.util.concurrent.TimeUnit.MILLISECONDS)) {
                             conseguiuTodos = false;
@@ -185,15 +186,19 @@ public class CarroMonitor extends AbstractCarro {
                         for (Estrada pos : caminhoA) {
                             pos.setCarro(this);
                         }
-                        // Faz a travessia
+                        // Faz a travessia, liberando lock da posição anterior a cada passo
+                        Estrada anterior = atual;
                         for (int i = 0; i < caminhoA.size(); i++) {
                             Estrada caminho = caminhoA.get(i);
                             Integer[][] posicoes = {
-                                    { atual.getLinha(), atual.getColuna() },
+                                    { anterior.getLinha(), anterior.getColuna() },
                                     { caminho.getLinha(), caminho.getColuna() }
                             };
                             controller.notificarMov(posicoes);
-                            atual.setCarro(null);
+                            anterior.setCarro(null);
+                            if (anterior.getLock().isHeldByCurrentThread()) {
+                                anterior.getLock().unlock();
+                            }
                             atual = caminho;
                             if (i < caminhoA.size() - 1) {
                                 try {
@@ -202,16 +207,20 @@ public class CarroMonitor extends AbstractCarro {
                                     throw new RuntimeException(e);
                                 }
                             }
+                            anterior = caminho;
                         }
-                        // Libera todas as posições do caminho
-                        for (Estrada pos : caminhoA) {
-                            pos.setCarro(null);
+                        // Libera o lock da última posição após sair do cruzamento
+                        if (atual.getLock().isHeldByCurrentThread()) {
+                            atual.getLock().unlock();
                         }
+                        atual.setCarro(null);
                         atravessou = true;
                     } else {
                         // Não conseguiu todos, libera os já adquiridos
                         for (Estrada pos : acquired) {
-                            pos.getLock().unlock();
+                            if (pos.getLock().isHeldByCurrentThread()) {
+                                pos.getLock().unlock();
+                            }
                         }
                         try {
                             Thread.sleep(100 + rand.nextInt(400));
