@@ -40,14 +40,24 @@ public abstract class Estrada {
     }
 
     public void setProxima(Estrada[][] proxima) {
-        if(direcao==1&&((linha-1)>=0))
-            this.proxima=proxima[linha-1][coluna];
-        if(direcao==2&&((coluna+1)<proxima[0].length))
-            this.proxima=proxima[linha][coluna+1];
-        if(direcao==3&&((linha+1)<proxima.length))
-            this.proxima=proxima[linha+1][coluna];
-        if(direcao==4&&((coluna-1)>=0))
-            this.proxima=proxima[linha][coluna-1];
+        switch (this.direcao)
+        {
+            case 1:
+                if((linha-1)>=0)
+                    this.proxima=proxima[linha-1][coluna];
+                break;
+            case 2:
+                if((coluna+1)<proxima[0].length)
+                    this.proxima=proxima[linha][coluna+1];
+                break;
+            case 3:
+                if((linha+1)<proxima.length)
+                    this.proxima=proxima[linha+1][coluna];
+                break;
+            case 4:
+                if((coluna-1)>=0)
+                    this.proxima=proxima[linha][coluna-1];
+        }
     }
 
     public int getDirecao() {
