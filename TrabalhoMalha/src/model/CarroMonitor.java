@@ -186,7 +186,7 @@ public class CarroMonitor extends AbstractCarro {
                         for (Estrada pos : caminhoA) {
                             pos.setCarro(this);
                         }
-                        // Faz a travessia, liberando lock da posição anterior a cada passo
+                        // Faz a travessia, SEM liberar lock/carro da posição anterior a cada passo
                         Estrada anterior = atual;
                         for (int i = 0; i < caminhoA.size(); i++) {
                             Estrada caminho = caminhoA.get(i);
@@ -195,10 +195,6 @@ public class CarroMonitor extends AbstractCarro {
                                     { caminho.getLinha(), caminho.getColuna() }
                             };
                             controller.notificarMov(posicoes);
-                            anterior.setCarro(null);
-                            if (anterior.getLock().isHeldByCurrentThread()) {
-                                anterior.getLock().unlock();
-                            }
                             atual = caminho;
                             if (i < caminhoA.size() - 1) {
                                 try {
@@ -209,11 +205,13 @@ public class CarroMonitor extends AbstractCarro {
                             }
                             anterior = caminho;
                         }
-                        // Libera o lock da última posição após sair do cruzamento
-                        if (atual.getLock().isHeldByCurrentThread()) {
-                            atual.getLock().unlock();
+                        // Após sair do cruzamento, libera todos os locks e campos carro
+                        for (Estrada pos : caminhoA) {
+                            pos.setCarro(null);
+                            if (pos.getLock().isHeldByCurrentThread()) {
+                                pos.getLock().unlock();
+                            }
                         }
-                        atual.setCarro(null);
                         atravessou = true;
                     } else {
                         // Não conseguiu todos, libera os já adquiridos
