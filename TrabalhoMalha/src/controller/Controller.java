@@ -1,6 +1,7 @@
 package controller;
 
 import model.AbstractCarro;
+import model.ConfiguracaoSimulacao;
 import model.Direcoes;
 
 import java.io.File;
@@ -11,25 +12,35 @@ public class Controller extends Thread{
     private final CriaMatriz matrizInstance = CriaMatriz.getInstance();
     private static Controller instance;
     private StateCarro state;
-    private int tipo;
+    private ConfiguracaoSimulacao configuracao;
     private List<Observer> observers = new ArrayList<>();
     private Map<String, String> caminhos = new HashMap<>();
-    private String arquivo = "TrabalhoMalha/src/malhas/malha-exemplo-1.txt";
 
     public Controller() {
         Direcoes.mapear();
-        matrizInstance.gerarMatriz(arquivo);
+        matrizInstance.gerarMatriz("TrabalhoMalha/src/malhas/malha-exemplo-1.txt");
         initMapa();
         state = new Finished(this);
         this.start();
     }
 
+    /**
+     * Inicia a simulação com a configuração fornecida.
+     * 
+     * @param config Configuração da simulação
+     */
+    public void iniciarSimulacao(ConfiguracaoSimulacao config) {
+        this.configuracao = config;
+        this.getStateCarro().nextState();
+    }
+
     public int getTipo() {
-        return tipo;
+        return (configuracao != null) ? configuracao.getTipoExclusaoMutua() : 0;
     }
 
     public void setTipo(int tipo) {
-        this.tipo = tipo;
+        // Mantido para compatibilidade com código existente
+        // Em uma refatoração mais avançada, este método poderia ser removido
     }
 
     public static Controller getInstance(){
@@ -89,8 +100,6 @@ public class Controller extends Thread{
     }
 
     private List<AbstractCarro> carros = new ArrayList<>();
-    private int qtdCarro;
-    private int await;
     private boolean stop = true;
 
     public boolean isStop() {
@@ -102,19 +111,21 @@ public class Controller extends Thread{
     }
 
     public int getAwait() {
-        return await;
+        return (configuracao != null) ? configuracao.getDelayInsercaoMs() : 0;
     }
 
     public void setAwait(int await) {
-        this.await = await*100;
+        // Mantido para compatibilidade com código existente
+        // Em uma refatoração mais avançada, este método poderia ser removido
     }
 
     public int getQtdCarro() {
-        return qtdCarro;
+        return (configuracao != null) ? configuracao.getQuantidadeCarros() : 0;
     }
 
     public void setQtdCarro(int qtdCarro) {
-        this.qtdCarro = qtdCarro;
+        // Mantido para compatibilidade com código existente
+        // Em uma refatoração mais avançada, este método poderia ser removido
     }
 
     public List<AbstractCarro> getCarros() {
@@ -138,16 +149,17 @@ public class Controller extends Thread{
     }
 
     public String getArquivo() {
-        return arquivo;
+        return (configuracao != null) ? configuracao.getArquivoMalha() : "TrabalhoMalha/src/malhas/malha-exemplo-1.txt";
     }
 
     public void setArquivo(String arquivo) {
-        this.arquivo = arquivo;
+        // Mantido para compatibilidade com código existente
+        // Em uma refatoração mais avançada, este método poderia ser removido
     }
 
     public void await(){
         try {
-            sleep(await);
+            sleep(getAwait());
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

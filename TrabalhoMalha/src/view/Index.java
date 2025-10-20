@@ -2,6 +2,7 @@ package view;
 
 import controller.Controller;
 import controller.Observer;
+import model.ConfiguracaoSimulacao;
 
 import javax.swing.*;
 import java.awt.*;
@@ -108,9 +109,16 @@ public class Index extends JFrame implements Observer {
         {
             if(controller.isStop())
             {
-                controller.setQtdCarro((int) tfCarro.getValue());
-                controller.setAwait((int) tfVelInsercao.getValue());
-                controller.setTipo(cbTipo.getSelectedIndex() + 1); 
+                // Cria o objeto de configuração com os dados da UI
+                int qtdCarros = (int) tfCarro.getValue();
+                int delay = (int) tfVelInsercao.getValue();
+                int tipo = cbTipo.getSelectedIndex() + 1;
+                String malha = controller.getCaminhos().get((String) matrizes.getSelectedItem());
+                
+                ConfiguracaoSimulacao config = new ConfiguracaoSimulacao(qtdCarros, delay, malha, tipo);
+                
+                // Passa o objeto para o Controller
+                controller.iniciarSimulacao(config);
             }
             controller.getStateCarro().nextState();
         });
