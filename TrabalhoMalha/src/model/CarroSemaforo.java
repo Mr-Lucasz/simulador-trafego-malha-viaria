@@ -89,109 +89,147 @@ public class CarroSemaforo extends AbstractCarro{
     }
 
     private List<Mutex> mapearCruzamento() throws InterruptedException {
-        Map<Integer, Mutex> opcoes = new HashMap<>();
-        int i=atual.getLinha();
-        int j=atual.getColuna();
+        Map<Integer, Mutex> celulasCruzamento = identificarCelulasCruzamento();
+        List<Mutex> possiveisSaidas = encontrarSaidasValidas(celulasCruzamento);
+        
+        if (possiveisSaidas.isEmpty()) {
+            return null;
+        }
+        
+        Mutex saidaEscolhida = possiveisSaidas.get(new Random().nextInt(possiveisSaidas.size()));
+        List<Mutex> caminho = determinarCaminhoNoCruzamento(saidaEscolhida, celulasCruzamento);
+        
+        if (tentarAdquirirRecursos(caminho, saidaEscolhida)) {
+            caminho.add(saidaEscolhida);
+            return caminho;
+        }
+        
+        // Libera recursos se não conseguir o caminho completo
+        List<Semaphore> recursosParaLiberar = new ArrayList<>();
+        recursosParaLiberar.add(saidaEscolhida.getSemaphore());
+        for (Mutex trecho : caminho) {
+            recursosParaLiberar.add(trecho.getSemaphore());
+        }
+        liberarRecursos(recursosParaLiberar);
+        Thread.sleep(velocidade);
+        return null;
+    }
 
-        switch (atual.getDirecao())
-        {
+    private Map<Integer, Mutex> identificarCelulasCruzamento() {
+        Map<Integer, Mutex> opcoes = new HashMap<>();
+        int i = atual.getLinha();
+        int j = atual.getColuna();
+
+        switch (atual.getDirecao()) {
             case 1:
-                opcoes.put(0,controller.getMatrizInstance().getEstrada(i-1,j));
-                opcoes.put(1, controller.getMatrizInstance().getEstrada(i-2,j));
-                opcoes.put(2,controller.getMatrizInstance().getEstrada(i-2,j-1));
-                opcoes.put(3,controller.getMatrizInstance().getEstrada(i-1,j-1));
+                opcoes.put(0, controller.getMatrizInstance().getEstrada(i-1, j));
+                opcoes.put(1, controller.getMatrizInstance().getEstrada(i-2, j));
+                opcoes.put(2, controller.getMatrizInstance().getEstrada(i-2, j-1));
+                opcoes.put(3, controller.getMatrizInstance().getEstrada(i-1, j-1));
                 break;
             case 2:
-                opcoes.put(0,controller.getMatrizInstance().getEstrada(i,j+1));
-                opcoes.put(1, controller.getMatrizInstance().getEstrada(i,j+2));
-                opcoes.put(2,controller.getMatrizInstance().getEstrada(i-1,j+2));
-                opcoes.put(3,controller.getMatrizInstance().getEstrada(i-1,j+1));
+                opcoes.put(0, controller.getMatrizInstance().getEstrada(i, j+1));
+                opcoes.put(1, controller.getMatrizInstance().getEstrada(i, j+2));
+                opcoes.put(2, controller.getMatrizInstance().getEstrada(i-1, j+2));
+                opcoes.put(3, controller.getMatrizInstance().getEstrada(i-1, j+1));
                 break;
             case 3:
-                opcoes.put(0,controller.getMatrizInstance().getEstrada(i+1,j));
-                opcoes.put(1, controller.getMatrizInstance().getEstrada(i+2,j));
-                opcoes.put(2,controller.getMatrizInstance().getEstrada(i+2,j+1));
-                opcoes.put(3,controller.getMatrizInstance().getEstrada(i+1,j+1));
+                opcoes.put(0, controller.getMatrizInstance().getEstrada(i+1, j));
+                opcoes.put(1, controller.getMatrizInstance().getEstrada(i+2, j));
+                opcoes.put(2, controller.getMatrizInstance().getEstrada(i+2, j+1));
+                opcoes.put(3, controller.getMatrizInstance().getEstrada(i+1, j+1));
                 break;
             case 4:
-                opcoes.put(0,controller.getMatrizInstance().getEstrada(i,j-1));
-                opcoes.put(1, controller.getMatrizInstance().getEstrada(i,j-2));
-                opcoes.put(2,controller.getMatrizInstance().getEstrada(i+1,j-2));
-                opcoes.put(3,controller.getMatrizInstance().getEstrada(i+1,j-1));
+                opcoes.put(0, controller.getMatrizInstance().getEstrada(i, j-1));
+                opcoes.put(1, controller.getMatrizInstance().getEstrada(i, j-2));
+                opcoes.put(2, controller.getMatrizInstance().getEstrada(i+1, j-2));
+                opcoes.put(3, controller.getMatrizInstance().getEstrada(i+1, j-1));
                 break;
         }
+        return opcoes;
+    }
+
+    private List<Mutex> encontrarSaidasValidas(Map<Integer, Mutex> celulasCruzamento) {
         List<Mutex> opcoesSaida = new ArrayList<>();
-        for(Mutex opcao: opcoes.values())
-        {
-            switch (opcao.getDirecao())
-            {
+        for (Mutex opcao : celulasCruzamento.values()) {
+            switch (opcao.getDirecao()) {
                 case 9:
-                    Mutex d = controller.getMatrizInstance().getEstrada(opcao.getLinha(),opcao.getColuna()+1);
-                    if(d.getDirecao()==2)
+                    Mutex d = controller.getMatrizInstance().getEstrada(opcao.getLinha(), opcao.getColuna()+1);
+                    if (d.getDirecao() == 2)
                         opcoesSaida.add(d);
                     break;
                 case 10:
-                    Mutex c = controller.getMatrizInstance().getEstrada(opcao.getLinha()-1,opcao.getColuna());
-                    if(c.getDirecao()==1)
+                    Mutex c = controller.getMatrizInstance().getEstrada(opcao.getLinha()-1, opcao.getColuna());
+                    if (c.getDirecao() == 1)
                         opcoesSaida.add(c);
                     break;
                 case 11:
-                    Mutex b = controller.getMatrizInstance().getEstrada(opcao.getLinha()+1,opcao.getColuna());
-                    if(b.getDirecao()==3)
+                    Mutex b = controller.getMatrizInstance().getEstrada(opcao.getLinha()+1, opcao.getColuna());
+                    if (b.getDirecao() == 3)
                         opcoesSaida.add(b);
                     break;
                 case 12:
-                    Mutex e = controller.getMatrizInstance().getEstrada(opcao.getLinha(),opcao.getColuna()-1);
-                    if(e.getDirecao()==2)
+                    Mutex e = controller.getMatrizInstance().getEstrada(opcao.getLinha(), opcao.getColuna()-1);
+                    if (e.getDirecao() == 2)
                         opcoesSaida.add(e);
                     break;
             }
         }
+        return opcoesSaida;
+    }
 
-        Mutex escolhido = opcoesSaida.get(new Random().nextInt(opcoesSaida.size()));
+    private List<Mutex> determinarCaminhoNoCruzamento(Mutex saidaEscolhida, Map<Integer, Mutex> celulasCruzamento) {
         List<Mutex> caminho = new ArrayList<>();
-        boolean pegarCaminho = escolhido.getSemaphore().tryAcquire(100, TimeUnit.MILLISECONDS);
-        if(pegarCaminho)
-        {
-            escolhido.setCarro(this);
-            if(atual.getDirecao()-escolhido.getDirecao()==0)
-            {
-                for(int r=0;r<2;r++)
-                    caminho.add(opcoes.get(r));
-            }
-            if(Math.abs(atual.getDirecao()-escolhido.getDirecao())==2)
-            {
-                for(int r=0;r<4;r++)
-                    caminho.add(opcoes.get(r));
-            }
-            if(atual.getDirecao()-escolhido.getDirecao()==-1 || atual.getDirecao()-escolhido.getDirecao()==3)
-            {
-                caminho.add(opcoes.get(0));
-            }
-            if(atual.getDirecao()-escolhido.getDirecao()==1 || atual.getDirecao()-escolhido.getDirecao()==-3)
-            {
-                for(int r=0;r<3;r++)
-                    caminho.add(opcoes.get(r));
-            }
-            for(Mutex caminho1 : caminho)
-            {
-                List<Semaphore> acquired = new ArrayList<>();
-                acquired.add(caminho1.getSemaphore());
-                boolean b = caminho1.getSemaphore().tryAcquire(100, TimeUnit.MILLISECONDS);
-                if(!b)
-                {
-                    escolhido.getSemaphore().release();
-                    for(Semaphore semaphore : acquired)
-                        semaphore.release();
-                    Thread.currentThread().sleep(velocidade);
-                    return null;
-                }
-            }
-            caminho.add(escolhido);
-            return caminho;
+        
+        if (atual.getDirecao() - saidaEscolhida.getDirecao() == 0) {
+            // Caminho reto
+            for (int r = 0; r < 2; r++)
+                caminho.add(celulasCruzamento.get(r));
+        } else if (Math.abs(atual.getDirecao() - saidaEscolhida.getDirecao()) == 2) {
+            // Curva de 180 graus
+            for (int r = 0; r < 4; r++)
+                caminho.add(celulasCruzamento.get(r));
+        } else if (atual.getDirecao() - saidaEscolhida.getDirecao() == -1 || atual.getDirecao() - saidaEscolhida.getDirecao() == 3) {
+            // Curva à direita
+            caminho.add(celulasCruzamento.get(0));
+        } else if (atual.getDirecao() - saidaEscolhida.getDirecao() == 1 || atual.getDirecao() - saidaEscolhida.getDirecao() == -3) {
+            // Curva à esquerda
+            for (int r = 0; r < 3; r++)
+                caminho.add(celulasCruzamento.get(r));
         }
-        Thread.currentThread().sleep(velocidade);
-        return null;
+        
+        return caminho;
+    }
+
+    private boolean tentarAdquirirRecursos(List<Mutex> caminho, Mutex saidaEscolhida) throws InterruptedException {
+        List<Semaphore> recursosAdquiridos = new ArrayList<>();
+        
+        // Primeiro tenta adquirir o semáforo da saída escolhida
+        boolean pegarCaminho = saidaEscolhida.getSemaphore().tryAcquire(100, TimeUnit.MILLISECONDS);
+        if (!pegarCaminho) {
+            return false;
+        }
+        
+        saidaEscolhida.setCarro(this);
+        recursosAdquiridos.add(saidaEscolhida.getSemaphore());
+        
+        // Depois tenta adquirir os semáforos do caminho
+        for (Mutex trecho : caminho) {
+            if (trecho.getSemaphore().tryAcquire(100, TimeUnit.MILLISECONDS)) {
+                recursosAdquiridos.add(trecho.getSemaphore());
+            } else {
+                // Se falhar, libera os recursos já adquiridos
+                liberarRecursos(recursosAdquiridos);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void liberarRecursos(List<Semaphore> recursos) {
+        for (Semaphore recurso : recursos) {
+            recurso.release();
+        }
     }
 
     private void moverCruzamento(){
